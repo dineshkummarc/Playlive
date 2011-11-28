@@ -2,7 +2,6 @@ require.paths.unshift('vendor/mongoose/lib');
 
 var sio = require('socket.io')
   , fs = require('fs')
-  , formidable = require('formidable')
   , exec  = require('child_process').exec
   , sys = require('sys')
   , url = require('url')
