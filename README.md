@@ -1,1 +1,1 @@
-Usage: `node app.js`
+Usage: `node server.js`
