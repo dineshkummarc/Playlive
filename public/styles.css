@@ -1,0 +1,37 @@
+.player_container {
+    font-family: Verdana, Arial, sans-serif;
+    width: 420px;
+    margin: 0 auto;
+}
+
+.player_status {
+    margin: 0 0 5px 0;
+    font-size: 80%;
+}
+
+div.jp-audio, div.jp-video {
+    border: 1px solid #DEDACD;
+}
+
+.jp-playlist li {
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.now_playing {
+    float: right;
+    margin-right: 10px;
+    font-style: italic;
+    font-size: 80%;
+}
+
+.jp-playlist .jp-playlist-item {
+    color: #FEFEFE;
+    text-decoration: none;
+}
+
+.jp-playlist .jp-playlist-item-remove {
+    color: red;
+    float: right;
+    text-decoration: none;
+}
