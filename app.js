@@ -24,7 +24,7 @@ app.configure(function () {
     }));
 });
 
-mongoose.connect('mongodb://localhost:27017/my_database');
+mongoose.connect('mongodb://localhost:27017/playlive');
 var Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId;
 
