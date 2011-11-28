@@ -5,7 +5,7 @@ var playlive = Backbone.View.extend({
     initialize: function() {
         this.status = $('.drop_zone .player_status');
 
-        this.socket = io.connect('http://localhost:3000');
+        this.socket = io.connect(window.location.origin);
         this.socket.emit('fetch_all');
 
         this.playlist = new jPlayerPlaylist({
