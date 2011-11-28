@@ -7,8 +7,7 @@ var sio = require('socket.io')
   , url = require('url')
   , express = require('express')
   , mongoose = require('mongoose')
-  , GridStore = require('mongodb').GridStore
-  , path = '/playlive'
+  , GridStore = require('mongodb').GridStore;
 
 var app = express.createServer();
 
