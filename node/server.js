@@ -1,17 +1,18 @@
-require.paths.unshift('vendor/mongoose/lib');
 
 var sio = require('socket.io')
   , basename = require('path').basename
   , express = require('express')
   , fs = require('fs')
   , mime = require('mime')
-  , mongoose = require('mongoose')
   , url = require('url')
+
+  , conf = require('./config.js')
+  , db = require('./database.js');
 
 var app = express.createServer();
 
 app.configure(function () {
-    app.use('/public', express.static(__dirname + '/public'));
+    app.use('/public', express.static(__dirname + '/../public'));
     app.set('views', __dirname);
     app.set('view engine', 'html');
 
@@ -20,23 +21,28 @@ app.configure(function () {
         "secret": "333333",
         "store":  new express.session.MemoryStore({ reapInterval: 60000 * 10 })
     }));
+
+    db.mongoose.connect('mongodb://'+conf.mongo);
 });
 
-mongoose.connect('mongodb://localhost:27017/playlive');
-var Schema = mongoose.Schema
-  , ObjectId = Schema.ObjectId;
-
-var TrackSchema = new Schema({
-    id    : ObjectId
-  , title     : String
-  , file      : String
+app.register('.html', {
+    compile: function(str, options){
+        return {
+            call: function() {
+                return str;
+            }
+        };
+    }
 });
 
-var Track = mongoose.model('Track', TrackSchema);
+app.listen(3000, function () {
+    var addr = app.address();
+    console.log('   app listening on http://' + addr.address + ':' + addr.port);
+});
 
 function requireLogin (req, res, next) {
     var queryString = url.parse(req.url,true);
-    if (queryString.query.user && queryString.query.user == 'grdn') {
+    if (queryString.query[conf.user] && queryString.query[conf.user] == conf.pass) {
         req.session.auth = true;
     }
 
@@ -49,33 +55,18 @@ function requireLogin (req, res, next) {
     }
 }
 
-app.register('.html', {
-    compile: function(str, options){
-        return {
-            call: function() {
-                return str;
-            }
-        };
-    }
-});
-
-app.get('/', [requireLogin], function (req, res) {
-    res.render('index', { layout: false });
-});
-
-app.listen(3000, function () {
-    var addr = app.address();
-    console.log('   app listening on http://' + addr.address + ':' + addr.port);
-});
-
 var io = sio.listen(app);
 
-var ALLOWED_MIME_TYPES = {
-    'audio/mpeg3': true,
-    'audio/mpeg': true
-};
+app.get('/', [requireLogin], function (req, res) {
+    res.render('../public/index.html', { layout: false });
+});
 
-app.post('/upload', function(req, res) {
+app.post('/upload', [requireLogin], function(req, res) {
+    var ALLOWED_MIME_TYPES = {
+        'audio/mpeg3': true,
+        'audio/mpeg': true
+    };
+
     var fName = basename(req.header('x-file-name'))
       , ws = fs.createWriteStream('./public/music/'+fName)
       , mimetype = mime.lookup(ws.path);
@@ -91,7 +82,7 @@ app.post('/upload', function(req, res) {
     });
 
     req.on('end', function(){
-        var track = new Track();
+        var track = new db.Track();
         track.title = fName;
         track.file = fName;
 
@@ -105,18 +96,17 @@ app.post('/upload', function(req, res) {
     });
 });
 
-
 io.sockets.on('connection', function (socket) {
 
     socket.on('create', function(data) {
-        var track = new Track();
+        var track = new db.Track();
         track.title = data.title;
         track.save();
     });
 
     socket.on('remove', function(data) {
         console.log('>> remove track', data);
-        Track.findById(data.id, function(err, track) {
+        db.Track.findById(data.id, function(err, track) {
             if (!err) {
                 track.remove();
                 io.sockets.emit('remove_track', {id: data.id});
@@ -129,7 +119,7 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('fetch_all', function(data) {
-        Track.find({}, function(err, tracks) {
+        db.Track.find({}, function(err, tracks) {
             console.log('tracks >>', tracks);
             for (i = 0; i < tracks.length; i++) {
                 socket.emit('add_track', tracks[i]);

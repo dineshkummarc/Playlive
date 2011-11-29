@@ -5,7 +5,7 @@ var PlayliveApplication = Backbone.View.extend({
 
 
     initialize: function() {
-        this.status = $('.drop_zone .player_status');
+        this.status = $('.player_nav .player_status');
 
         this.socket = io.connect(window.location.origin);
 
@@ -157,7 +157,7 @@ var PlayliveApplication = Backbone.View.extend({
         // Send the file
         var xhr = new XMLHttpRequest();
         xhr.upload.addEventListener('progress', this._call('uploadProgress'), false);
-        xhr.onreadystatechange = this.stateChange;
+        xhr.onreadystatechange = this._call('stateChange');
         xhr.open('POST', '/upload', true);
         xhr.setRequestHeader('X-FILE-NAME', file.name);
         xhr.send(file);
