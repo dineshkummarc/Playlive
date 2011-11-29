@@ -1,13 +1,12 @@
 require.paths.unshift('vendor/mongoose/lib');
 
 var sio = require('socket.io')
-  , fs = require('fs')
-  , exec  = require('child_process').exec
-  , sys = require('sys')
-  , url = require('url')
+  , basename = require('path').basename
   , express = require('express')
+  , fs = require('fs')
+  , mime = require('mime')
   , mongoose = require('mongoose')
-  , GridStore = require('mongodb').GridStore;
+  , url = require('url')
 
 var app = express.createServer();
 
@@ -77,12 +76,9 @@ var ALLOWED_MIME_TYPES = {
 };
 
 app.post('/upload', function(req, res) {
-    var basename = require('path').basename
-    , fName = basename(req.header('x-file-name'))
-    , mime = require('mime')
-    , ws = fs.createWriteStream('./public/music/'+fName);
-
-    var mimetype = mime.lookup(ws.path);
+    var fName = basename(req.header('x-file-name'))
+      , ws = fs.createWriteStream('./public/music/'+fName)
+      , mimetype = mime.lookup(ws.path);
 
     if (!ALLOWED_MIME_TYPES[mimetype]) {
         console.log('### ERROR: INVALID MIMETYPE', mimetype);
@@ -94,12 +90,19 @@ app.post('/upload', function(req, res) {
         ws.write(data);
     });
 
-    var track = new Track();
-    track.title = fName;
-    track.file = fName;
-    track.save();
+    req.on('end', function(){
+        var track = new Track();
+        track.title = fName;
+        track.file = fName;
 
-    io.sockets.emit('add_track', track);
+        track.save(function(err) {
+            if (!err) {
+                console.log('track created! file uploaded : '+fName);
+                io.sockets.emit('add_track', track);
+                res.end('ok');
+            }
+        });
+    });
 });
 
 
@@ -112,6 +115,7 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('remove', function(data) {
+        console.log('>> remove track', data);
         Track.findById(data.id, function(err, track) {
             if (!err) {
                 track.remove();

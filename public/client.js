@@ -65,6 +65,11 @@ var playlive = Backbone.View.extend({
         };
     },
 
+    // polymorphic
+    log: function() {
+        return console && Function.prototype.bind.call(console.log, console).apply(console, arguments);
+    },
+
 
     // --- DOM events --- //
 
@@ -100,6 +105,7 @@ var playlive = Backbone.View.extend({
     },
 
     addTrack: function(track) {
+        this.log('>> add track', track);
         this.playlist.add({
             title: track.title,
             mp3: '/public/music/'+track.file,
