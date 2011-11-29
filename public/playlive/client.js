@@ -1,12 +1,13 @@
-var playlive = Backbone.View.extend({
 
+
+var PlayliveApplication = Backbone.View.extend({
     el: $('body'),
+
 
     initialize: function() {
         this.status = $('.drop_zone .player_status');
 
         this.socket = io.connect(window.location.origin);
-        this.socket.emit('fetch_all');
 
         this.playlist = new jPlayerPlaylist({
             jPlayer: "#jquery_jplayer_1",
@@ -34,6 +35,13 @@ var playlive = Backbone.View.extend({
         dropZone = $('.drop_zone');
         dropZone.removeClass('error');
 
+        this.views = {
+            'main': new PlayliveMainView(),
+        };
+
+        // default view
+        this.setView(this.views.main);
+
         // Check if window.FileReader exists to make 
         // sure the browser supports file uploads
         if (typeof(window.FileReader) == 'undefined') {
@@ -55,6 +63,18 @@ var playlive = Backbone.View.extend({
         };
 
         dropZone[0].ondrop = this._call('onDrop');
+    },
+
+    setView: function(view) {
+        this.log('>> view changed', view);
+
+        // empty all items
+        $('.jp-playlist li').remove();
+
+        // display all items
+        this.socket.emit(view.fetchEvent);
+
+        this.view = view;
     },
 
     // call a method passing the player context
@@ -161,6 +181,10 @@ var playlive = Backbone.View.extend({
             }
         }
     }
+});
+
+window.PlayliveMainView = Backbone.View.extend({
+    fetchEvent: 'fetch_all'
 });
 
 jPlayerPlaylist.prototype._createListItem = function(media) {

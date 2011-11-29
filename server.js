@@ -99,7 +99,7 @@ app.post('/upload', function(req, res) {
             if (!err) {
                 console.log('track created! file uploaded : '+fName);
                 io.sockets.emit('add_track', track);
-                res.end('ok');
+                res.end('');
             }
         });
     });

@@ -2,11 +2,14 @@
 <html>
     <head>
         <link href='/public/jPlayer/skin/blue.monday/jplayer.blue.monday.css' rel='stylesheet'>
-        <link href='/public/styles.css' rel='stylesheet'>
+        <link href='/public/playlive/styles.css' rel='stylesheet'>
     </head>
     <body class="drop_zone">
         <div class="player_container">
-            <div class="player_status"></div>
+            <div class="player_nav">
+                <div class="nav_buttons"></div>
+                <div class="player_status"></div>
+            </div>
             <div id="jquery_jplayer_1" class="jp-jplayer"></div>
             <div id="jp_container_1" class="jp-audio">
                 <div class="jp-type-single">
@@ -60,11 +63,11 @@
         <script src='/public/backbone.js'></script>
         <script src='/public/jPlayer/jquery.jplayer/jquery.jplayer.js'></script>
         <script src='/public/jPlayer/add-on/jplayer.playlist.js'></script>
-        <script src='/public/client.js'></script>
+        <script src='/public/playlive/client.js'></script>
 
         <script>
             $(document).ready(function(){
-                new playlive();
+                new PlayliveApplication();
             });
         </script>
     </body>
