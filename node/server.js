@@ -104,6 +104,14 @@ io.sockets.on('connection', function (socket) {
         track.save();
     });
 
+    socket.on('create_playlist', function(data) {
+        console.log('>> create playlist', data);
+        var playlist = new db.Playlist();
+        playlist.title = data.title;
+        playlist.save();
+        socket.emit('add_playlist', data);
+    });
+
     socket.on('remove', function(data) {
         console.log('>> remove track', data);
         db.Track.findById(data.id, function(err, track) {
@@ -118,11 +126,20 @@ io.sockets.on('connection', function (socket) {
         io.sockets.emit('play_track', data);
     });
 
-    socket.on('fetch_all', function(data) {
+    socket.on('fetch_tracks', function(data) {
         db.Track.find({}, function(err, tracks) {
-            console.log('tracks >>', tracks);
+            console.log('fetch all tracks >>', tracks);
             for (i = 0; i < tracks.length; i++) {
                 socket.emit('add_track', tracks[i]);
+            }
+        });
+    });
+
+    socket.on('fecth_playlists', function(data) {
+        db.Playlist.find({}, function(err, playlists) {
+            console.log('fetch all playlists >>', playlists);
+            for (i = 0; i < playlists.length; i++) {
+                socket.emit('add_playlist', playlists[i]);
             }
         });
     });
