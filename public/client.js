@@ -148,8 +148,8 @@ var PlayliveApplication = Backbone.View.extend({
         var file = event.dataTransfer.files[0];
 
         // Validate file size
-        if(file.size > 30000000) {
-            dropZone.text('File Too Large!');
+        if(file.size > 30*1000*1000) {
+            this.status.text('File Too Large!');
             dropZone.addClass('error');
             return false;
         }

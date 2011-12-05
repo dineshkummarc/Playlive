@@ -5,8 +5,8 @@ var sio = require('socket.io')
   , fs = require('fs')
   , mime = require('mime')
   , url = require('url')
-
   , conf = require('./config.js')
+  , mustache= require('./vendor/mustache.js')
   , db = require('./database.js');
 
 var app = express.createServer();
@@ -29,7 +29,7 @@ app.register('.html', {
     compile: function(str, options){
         return {
             call: function() {
-                return str;
+                return mustache.to_html(str, options);
             }
         };
     }
@@ -58,7 +58,7 @@ function requireLogin (req, res, next) {
 var io = sio.listen(app);
 
 app.get('/', [requireLogin], function (req, res) {
-    res.render('../public/index.html', { layout: false });
+    res.render('../public/index.html', { layout: false, test: undefined != url.parse(req.url, true).query.test });
 });
 
 app.post('/upload', [requireLogin], function(req, res) {

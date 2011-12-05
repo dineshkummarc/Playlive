@@ -67,8 +67,50 @@
 
         <script>
             $(document).ready(function(){
-                new PlayliveApplication();
+                window.playlive = new PlayliveApplication();
             });
         </script>
+
+        {{#test}}
+            <link href="/public/vendor/jasmine/lib/jasmine-core/jasmine.css" rel="stylesheet"/>
+            <script type="text/javascript" src="/public/vendor/jasmine/lib/jasmine-core/jasmine.js"></script>
+
+            <!-- include source files here... -->
+            <script type="text/javascript" src="/public/vendor/jasmine/src/html/HtmlReporterHelpers.js"></script>
+            <script type="text/javascript" src="/public/vendor/jasmine/src/html/HtmlReporter.js"></script>
+            <script type="text/javascript" src="/public/vendor/jasmine/src/html/HtmlReporterHelpers.js"></script>
+            <script type="text/javascript" src="/public/vendor/jasmine/src/html/ReporterView.js"></script>
+            <script type="text/javascript" src="/public/vendor/jasmine/src/html/SpecView.js"></script>
+            <script type="text/javascript" src="/public/vendor/jasmine/src/html/SuiteView.js"></script>
+            <script type="text/javascript" src="/public/vendor/jasmine/src/html/TrivialReporter.js"></script>
+            <script type="text/javascript" src="/public/vendor/jasmine/src/console/ConsoleReporter.js"></script>
+
+            <script type="text/javascript">
+                (function() {
+                    var jasmineEnv = jasmine.getEnv();
+                    var htmlReporter = new jasmine.HtmlReporter();
+
+                    jasmineEnv.updateInterval = 1000;
+                    jasmineEnv.addReporter(htmlReporter);
+                    jasmineEnv.specFilter = function(spec) {
+                        return htmlReporter.specFilter(spec);
+                    };
+
+                    var currentWindowOnload = window.onload;
+
+                    window.onload = function() {
+                        if (currentWindowOnload) {
+                        currentWindowOnload();
+                        }
+                        execJasmine();
+                    };
+
+                    function execJasmine() {
+                        jasmineEnv.execute();
+                    }
+                })();
+            </script>
+            <script src="/public/test.js"></script>
+        {{/test}}
     </body>
 </html>
