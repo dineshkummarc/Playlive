@@ -10,6 +10,14 @@ $(document).ready(function(){
             };
         });
 
+        describe('playlist', function() {
+            it('can create a new playlist', function() {
+                expect($('html:contains("new playlist")').length).toEqual(0);
+                $('.add_playlist').click();
+                expect($('html:contains("new playlist")').length).toEqual(1);
+            });
+        });
+
         describe('view', function() {
             it('default view is the main view', function() {
                 expect(p.view).toBe(p.views.main);

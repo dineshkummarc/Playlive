@@ -97,10 +97,17 @@ var PlayliveApplication = Backbone.View.extend({
     events: {
         'click #jplayer_top_add': 'openUploadPane',
         'click .jp-playlist-item-remove': 'remove',
+        'click .add_playlist': 'newPlaylist'
     },
 
     openUploadPane: function(event) {
         this.$('.drop_zone').show();
+    },
+
+    newPlaylist: function(event) {
+        this.playlist.add({
+            title: 'new playlist'
+        });
     },
 
     remove: function(e) {
@@ -199,7 +206,7 @@ window.PlayliveMainView = Backbone.View.extend({
 
   , init: function() {
         $('.player_nav .nav_buttons').html(
-            $('<a/>').text('add playlist').attr('href', '#')
+            $('<a/>').text('add playlist').attr('href', '#').addClass('add_playlist')
         );
     }
 });
