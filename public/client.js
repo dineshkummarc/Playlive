@@ -1,8 +1,7 @@
 
-
 var PlayliveApplication = Backbone.View.extend({
-    el: $('body'),
 
+    el: $('body'),
 
     initialize: function() {
         this.status = $('.player_nav .player_status');
@@ -36,7 +35,8 @@ var PlayliveApplication = Backbone.View.extend({
         dropZone.removeClass('error');
 
         this.views = {
-            'main': new PlayliveMainView(),
+            'main'      : new PlayliveMainView(),
+            'playlist'  : new PlaylivePlaylistView(),
         };
 
         // default view
@@ -66,13 +66,14 @@ var PlayliveApplication = Backbone.View.extend({
     },
 
     setView: function(view) {
-        this.log('>> view changed', view);
-
         // empty all items
         $('.jp-playlist li').remove();
 
         // display all items
+        this.log('>> view changed', view.fetchEvent);
         this.socket.emit(view.fetchEvent);
+
+        view.init();
 
         this.view = view;
     },
@@ -121,6 +122,7 @@ var PlayliveApplication = Backbone.View.extend({
 
     _events: {
         'add_track': 'addTrack',
+        'add_playlist': 'addPlaylist',
         'remove_track': 'removeTrack',
     },
 
@@ -130,6 +132,15 @@ var PlayliveApplication = Backbone.View.extend({
             title: track.title,
             mp3: '/public/music/'+track.file,
             id: track._id
+        });
+    },
+
+    addPlaylist: function(track) {
+        this.log('>> add playlist', playlist);
+        this.playlist.add({
+            title: playlist.title,
+            mp3: playlist.title,
+            id: playlist._id
         });
     },
 
@@ -184,7 +195,17 @@ var PlayliveApplication = Backbone.View.extend({
 });
 
 window.PlayliveMainView = Backbone.View.extend({
-    fetchEvent: 'fetch_all'
+    fetchEvent: 'fetch_playlists'
+
+  , init: function() {
+        $('.player_nav .nav_buttons').html(
+            $('<a/>').text('add playlist').attr('href', '#')
+        );
+    }
+});
+
+window.PlaylivePlaylistView = Backbone.View.extend({
+    fetchEvent: 'fetch_tracks'
 });
 
 jPlayerPlaylist.prototype._createListItem = function(media) {
